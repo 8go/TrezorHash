@@ -53,13 +53,13 @@ def useTerminal(teh, settings):
 	for ii in range(settings.inputArgs.count('')):
 		settings.inputArgs.remove('')  # get rid of all empty strings
 	if len(settings.inputArgs) == 0:
-		settings.input = raw_input("Please provide an input string to be hashed: "
+		settings.input = raw_input(u"Please provide an input string to be hashed: "
 			"(Carriage return to quit) ")
 		# convert all input as possible to unicode UTF-8
 		settings.input = settings.input.decode('utf-8')
 		if settings.input == "":
-			settings.mlogger.log("User decided to abandon.", logging.DEBUG,
-				"Trezor IO")
+			settings.mlogger.log(u"User decided to abandon.", logging.DEBUG,
+				u"Trezor IO")
 			sys.exit(3)
 		settings.inputArgs.append(settings.input)
 	for item in settings.inputArgs:
@@ -82,8 +82,8 @@ def main():
 	trezor.prefillPassphrase(u'')
 
 	if settings.TArg:
-		settings.mlogger.log("Terminal mode --terminal was set. Avoiding GUI.",
-			logging.INFO, "Arguments")
+		settings.mlogger.log(u"Terminal mode --terminal was set. Avoiding GUI.",
+			logging.INFO, u"Arguments")
 		dialog = None
 	else:
 		dialog = Dialog(trezor, settings)

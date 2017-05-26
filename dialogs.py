@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 import logging
+import sys
 
 from PyQt4 import QtGui
 from PyQt4.QtGui import QPixmap
@@ -77,8 +78,9 @@ class Dialog(QtGui.QDialog, Ui_Dialog):
 			"computes the encrypted hash (digest) of an input string "
 			"(message) using a Trezor hardware "
 			"device for safety and security.<br><br>" +
-			"<b>Version: </b>" + basics.THVERSION +
-			" from " + basics.THVERSIONTEXT)
+			"<b>TrezorHash Version: </b>" + basics.THVERSION +
+			" from " + basics.THVERSIONTEXT +
+			"<br><br><b>Python Version: </b>" + sys.version.replace(" \n", "; "))
 		msgBox.setIconPixmap(QPixmap("icons/TrezorHash.92x128.png"))
 		msgBox.exec_()
 

@@ -87,6 +87,9 @@
      </item>
      <item row="4" column="0" colspan="3">
       <widget class="QLineEdit" name="pinEdit">
+       <property name="inputMethodHints">
+        <set>Qt::ImhDigitsOnly|Qt::ImhHiddenText|Qt::ImhNoAutoUppercase|Qt::ImhNoPredictiveText|Qt::ImhPreferNumbers</set>
+       </property>
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>
        </property>

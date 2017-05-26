@@ -375,8 +375,8 @@ class Args(object):
 		Cancel, Quit: Esc, Control-Q
 		Version, About: Control-T
 
-		Requires: python 2.7 and PyQt4 and trezorlib library.
-		Tested on Linux on Python 2.7.
+		Requires: python 2.7 or 3.4+ and PyQt4 and trezorlib library.
+		Tested on Linux on Python 2.7 and 3.4.
 
 		BTW, for testing 'xsel -bi', 'xsel -bo' and 'xsel -bc' set, write and clear the clipboard on Linux.
 
@@ -443,12 +443,13 @@ class Args(object):
 				sys.exit(19)
 			settings.LArg = loglevel * 10  # https://docs.python.org/2/library/logging.html#levels
 		logger.setLevel(settings.LArg)
-		logger.info(u'Logging level set to %s (%d).',
-			logging.getLevelName(settings.LArg), settings.LArg)
 
-		for arg in args:
-			# convert all input as possible to unicode UTF-8
-			settings.inputArgs.append(arg.decode('utf-8'))
+		if sys.version_info[0] > 2:
+			settings.inputArgs = args
+		else:
+			for arg in args:
+				# convert all input as possible to unicode UTF-8
+				settings.inputArgs.append(arg.decode('utf-8'))
 		if settings.MArg and not settings.TArg:
 			self.settings.mlogger.log(u"Multiple inputs can only be used "
 				"in terminal mode. Add '-t' or remove '-m'.",
@@ -462,4 +463,12 @@ class Args(object):
 				logging.CRITICAL, "Wrong arguments", True, logger)
 			sys.exit(2)
 		settings.mlogger.setTerminalMode(settings.TArg)
+		self.settings.mlogger.log(u"Version: %s (%s)" %
+			(basics.THVERSION, basics.THVERSIONTEXT),
+			logging.INFO, "Wrong arguments", True, logger)
+		self.settings.mlogger.log(u"Python: %s" % sys.version.replace(" \n", "; "),
+			logging.INFO, "Wrong arguments", True, logger)
+		self.settings.mlogger.log(u'Logging level set to %s (%d).' %
+			(logging.getLevelName(settings.LArg), settings.LArg),
+			logging.INFO, "Wrong arguments", True, logger)
 		settings.printSettings()

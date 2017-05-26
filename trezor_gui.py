@@ -18,7 +18,7 @@ class TrezorPassphraseDialog(QtGui.QDialog, Ui_TrezorPassphraseDialog):
 		self.setupUi(self)
 
 	def passphrase(self):
-		return self.passphraseEdit.text()
+		return q2s(self.passphraseEdit.text())
 
 
 class EnterPinDialog(QtGui.QDialog, Ui_EnterPinDialog):

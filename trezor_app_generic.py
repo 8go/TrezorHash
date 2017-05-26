@@ -14,6 +14,17 @@ from trezorlib.transport import ConnectionError
 
 from trezor_gui import TrezorPassphraseDialog, EnterPinDialog, TrezorChooserDialog
 
+"""
+This code is written specifically such that both terminal-only as well as
+GUI mode are supported for all 3 operations: Trezor choser, PIN entry,
+Passphrase entry.
+Each of the windows can be turned on or off individually with the 3 flags:
+readpinfromstdin, readpassphrasefromstdin, and readdevicestringfromstdin.
+
+Code should work on both Python 2.7 as well as 3.4.
+Requires PyQt4.
+"""
+
 
 class QtTrezorMixin(object):
 	"""
@@ -37,37 +48,36 @@ class QtTrezorMixin(object):
 		if self.readpassphrasefromstdin:
 			# read passphrase from stdin
 			try:
-				passphrase = getpass.getpass("Please enter passphrase: ")
+				passphrase = getpass.getpass(u"Please enter passphrase: ")
 				passphrase = str(passphrase)
 			except KeyboardInterrupt:
-				sys.stderr.write("\nKeyboard interrupt: passphrase not read. Aborting.\n")
+				sys.stderr.write(u"\nKeyboard interrupt: passphrase not read. Aborting.\n")
 				sys.exit(3)
 			except Exception as e:
-				sys.stderr.write("Critical error: Passphrase not read. Aborting. (%s)" % e)
+				sys.stderr.write(u"Critical error: Passphrase not read. Aborting. (%s)" % e)
 				sys.exit(3)
 		else:
 			dialog = TrezorPassphraseDialog()
 			if not dialog.exec_():
 				sys.exit(3)
 			else:
-				passphrase = dialog.passphraseEdit.text()
-				passphrase = str(passphrase)
+				passphrase = dialog.passphrase()
 
 		return proto.PassphraseAck(passphrase=passphrase)
 
 	def callback_PinMatrixRequest(self, msg):
 		if self.readpinfromstdin:
 			# read PIN from stdin
-			print("                  7  8  9")
-			print("                  4  5  6")
-			print("                  1  2  3")
+			print(u"                  7  8  9")
+			print(u"                  4  5  6")
+			print(u"                  1  2  3")
 			try:
-				pin = getpass.getpass("Please enter PIN: ")
+				pin = getpass.getpass(u"Please enter PIN: ")
 			except KeyboardInterrupt:
-				sys.stderr.write("\nKeyboard interrupt: PIN not read. Aborting.\n")
+				sys.stderr.write(u"\nKeyboard interrupt: PIN not read. Aborting.\n")
 				sys.exit(7)
 			except Exception as e:
-				sys.stderr.write("Critical error: PIN not read. Aborting. (%s)" % e)
+				sys.stderr.write(u"Critical error: PIN not read. Aborting. (%s)" % e)
 				sys.exit(7)
 		else:
 			dialog = EnterPinDialog()
@@ -82,7 +92,10 @@ class QtTrezorMixin(object):
 		Instead of asking for passphrase, use this one
 		"""
 		if passphrase is not None:
-			self.passphrase = passphrase.decode("utf-8")
+			if sys.version_info[0] > 2:
+				self.passphrase = passphrase
+			else:
+				self.passphrase = passphrase.decode("utf-8")
 		else:
 			self.passphrase = None
 
@@ -146,13 +159,13 @@ class TrezorChooser(object):
 		@returns HidTransport object of selected device
 		"""
 		if not len(devices):
-			raise RuntimeError("No Trezor connected!")
+			raise RuntimeError(u"No Trezor connected!")
 
 		if len(devices) == 1:
 			try:
 				return HidTransport(devices[0])
 			except IOError:
-				raise RuntimeError("Trezor is currently in use")
+				raise RuntimeError(u"Trezor is currently in use")
 
 		# maps deviceId string to device label
 		deviceMap = {}
@@ -169,33 +182,37 @@ class TrezorChooser(object):
 				continue
 
 		if not deviceMap:
-			raise RuntimeError("All connected Trezors are in use!")
+			raise RuntimeError(u"All connected Trezors are in use!")
 
 		if self.readdevicestringfromstdin:
-			print('Chose your Trezor device please. Devices currently in use are not listed:')
+			print(u'Chose your Trezor device please. '
+				'Devices currently in use are not listed:')
 			ii = 0
 			for device in deviceMap:
 				print('%d  %s' % (ii, deviceMap[device]))
 				ii += 1
 			ii -= 1
 			while True:
-				inputstr = raw_input("Please provide the number of the device chosen: (%d-%d, Carriage return to quit) " % (0, ii))
+				inputstr = raw_input(u"Please provide the number of the device "
+					"chosen: (%d-%d, Carriage return to quit) " % (0, ii))
 				if inputstr == '':
-					raise RuntimeError("No Trezors device chosen! Quitting.")
+					raise RuntimeError(u"No Trezors device chosen! Quitting.")
 				try:
 					inputint = int(inputstr)
 				except Exception:
-					print('Wrong input. You must enter a number between %d and %d. Try again.' % (0, ii))
+					print(u'Wrong input. You must enter a number '
+						'between %d and %d. Try again.' % (0, ii))
 					continue
 				if inputint < 0 or inputint > ii:
-					print('Wrong input. You must enter a number between %d and %d. Try again.' % (0, ii))
+					print(u'Wrong input. You must enter a number '
+						'between %d and %d. Try again.' % (0, ii))
 					continue
 				break
 			deviceStr = deviceMap.keys()[ii]
 		else:
 			dialog = TrezorChooserDialog(deviceMap)
 			if not dialog.exec_():
-				raise RuntimeError("No Trezors device chosen! Quitting.")
+				raise RuntimeError(u"No Trezors device chosen! Quitting.")
 			deviceStr = dialog.chosenDeviceStr()
 
 		return HidTransport([deviceStr, None])
@@ -208,18 +225,18 @@ def setupTrezor(readdevicestringfromstdin=False, mlogger=None):
 	"""
 	try:
 		if mlogger is not None:
-			mlogger.log("Starting Trezor initialization", logging.DEBUG, "Trezor Info")
+			mlogger.log(u"Starting Trezor initialization", logging.DEBUG, u"Trezor Info")
 		trezorChooser = TrezorChooser(readdevicestringfromstdin)
 		trezor = trezorChooser.getDevice()
 	except (ConnectionError, RuntimeError) as e:
 		if mlogger is not None:
-			mlogger.log("Connection to Trezor failed: %s" % e.message,
-			logging.CRITICAL, "Trezor Error")
+			mlogger.log(u"Connection to Trezor failed: %s" % e.message,
+			logging.CRITICAL, u"Trezor Error")
 		sys.exit(1)
 
 	if trezor is None:
 		if mlogger is not None:
-			mlogger.log("No available Trezor found, quitting.",
-				logging.CRITICAL, "Trezor Error")
+			mlogger.log(u"No available Trezor found, quitting.",
+				logging.CRITICAL, u"Trezor Error")
 		sys.exit(1)
 	return trezor

@@ -48,7 +48,7 @@ Below a sample screenshot. More screenshots [here](screenshots).
 # Build and runtime requirements
 
   * [Trezor](https://www.trezor.io) device
-  * [Python](https://www.python.org/) v2.7
+  * [Python](https://www.python.org/) v2.7 or 3.4+
   * PyCrypto
   * PyQt4
   * [trezorlib from python-trezor](https://github.com/trezor/python-trezor)
@@ -70,6 +70,8 @@ like `pyqt4-dev-tools` or `PyQt4-devel`).
 Run:
 
     python TrezorHash.py
+or
+    python3 TrezorHash.py
 
 Run-time command line options are
 
@@ -142,8 +144,8 @@ Apply, Hash: Control-A, Control-S
 Cancel, Quit: Esc, Control-Q
 Version, About: Control-T
 
-Requires: python 2.7 and PyQt4 and trezorlib library.
-Tested on Linux on Python 2.7.
+Requires: python 2.7 or 3.4+ and PyQt4 and trezorlib library.
+Tested on Linux on Python 2.7 and 3.4.
 
 BTW, for testing 'xsel -bi', 'xsel -bo' and 'xsel -bc' set, write and clear the clipboard on Linux.
 ```
@@ -184,7 +186,7 @@ single-file-executablefile.
 - - -
 **Question:** In which language is TrezorHash written?
 
-**Answer:** [Python](https://www.python.org/) 2.7. It will currently not run on Python 3.
+**Answer:** [Python](https://www.python.org/). It will currently run on Python 2.7 and 3.4+.
 - - -
 **Question:** Do I need to have a [Trezor](https://www.trezor.io/) in
 order to use TrezorHash?
@@ -273,5 +275,13 @@ Testing has only been done on Linux.
 
 **Answer:** Let us know.
 - - -
+
+# To-do List
+
+[ ] There is a bug in Qt4 not allowing foreign characters to be entered
+via the Alt-Gr keys from
+the keyboard in the password field (used to read Trezor passphrase).
+A work around could be written. Immediate work around is copy-paste.
+
 
 </> on :octocat: with :heart:

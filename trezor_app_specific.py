@@ -12,6 +12,28 @@ import encoding
 class TrezorEncryptedHash(object):
 	"""
 	class that does the Trezor hash encryption
+
+	Methods setAddress() and setIV() are usually called only at initialization.
+	They create an address and an AES-CBS initialization vector.
+	Address and IV are stored internally in the class to make the
+	trezorEncryptHash() call simpler and with fewer parameters.
+
+	In summary the encrypted hash is computed as follows:
+	The 999th public receiving BTC address of account 0 of the Trezor wallet without
+	passphrase is computed. From this address the MD5 hash is derived. This is a
+	16-byte digest which will later be used as initial vector IV in the AES
+	encryption.
+	The input is a message in unicode UTF-8.
+	A SHA256 hash is computed from this message.
+	The resulting 32-byte digest is encrypted on the Trezor with AES CBC using
+	the IV mentioned before. This encryption uses some static magic numbers
+	as keys. The encryption is also influenced by the `confirm-on-Trezor-button`
+	flags. This is why the output for running the program is different
+	depending whether a `confirm-button` press is required or not.
+	This encrypted byte array is also 32-bytes. It will be again hashed with
+	SHA256 resulting in the final 32-byte, i.e. 256-bit, digest which is the
+	final output. This outbut is converted into a hex string of 64 letters
+	in the alphabet [0-9a-f]. This 64-letter string is returned to the caller.
 	"""
 
 	def __init__(self, trezor, settings):
