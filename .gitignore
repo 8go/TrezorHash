@@ -99,3 +99,11 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# UI auto-generated files
+ui_*.py
+
+# Misc
+*.org
+*.bak
+
