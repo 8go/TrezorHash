@@ -71,6 +71,7 @@ Run:
 
     python TrezorHash.py
 or
+
     python3 TrezorHash.py
 
 Run-time command line options are
@@ -278,7 +279,7 @@ Testing has only been done on Linux.
 
 # To-do List
 
-[ ] There is a bug in Qt4 not allowing foreign characters to be entered
+- [ ]  There is a bug in Qt4 not allowing foreign characters to be entered
 via the Alt-Gr keys from
 the keyboard in the password field (used to read Trezor passphrase).
 A work around could be written. Immediate work around is copy-paste.
