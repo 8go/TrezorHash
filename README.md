@@ -9,7 +9,7 @@ allows you to compute an encrypted digest of an input message using the Trezor d
 
 # Features
 
-* Encrypted [https://en.wikipedia.org/wiki/Cryptographic_hash_function](hash)
+* Encrypted [hash](https://en.wikipedia.org/wiki/Cryptographic_hash_function)
     * deterministic, same input (message) leads to same output (digest)
     * quick
     * infeasible to determine input from output without brute-forcing
