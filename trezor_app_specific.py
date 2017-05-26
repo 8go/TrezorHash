@@ -78,7 +78,9 @@ class TrezorEncryptedHash(object):
 			encoding.Magic.hashKey, binhash,
 			ask_on_encrypt=(not self.settings.NArg), ask_on_decrypt=True,
 			iv=self.iv)
-		# length of binhash == length of binoutput == 32, length of hexoutput == 64, length of stroutput == 64
-		hexoutput = binascii.hexlify(binoutput)
+		binoutput2 = hashlib.sha256(binoutput).digest()
+		# length of binhash == length of binoutput == len of binoutput2 = 32
+		# length of hexoutput == 64, length of stroutput == 64
+		hexoutput = binascii.hexlify(binoutput2)
 		stroutput = hexoutput.decode('utf-8')
 		return stroutput

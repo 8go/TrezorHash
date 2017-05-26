@@ -1,4 +1,4 @@
-# ![Trezor icon](icons/TrezorHash.png)
+# ![Trezor icon](icons/TrezorHash.92x128.png)
 
 # TrezorHash
 
@@ -9,35 +9,35 @@ allows you to compute an encrypted digest of an input message using the Trezor d
 
 # Features
 
-    * Encrypted [https://en.wikipedia.org/wiki/Cryptographic_hash_function](hash)
-        * deterministic, same input (message) leads to same output (digest)
-        * quick
-        * infeasible to determine input from output without brute-forcing
-    * Possible applications:
-        * Pseudorandom bit generation
-        * [Key derivation](https://en.wikipedia.org/wiki/Key_derivation_function):
-            Convenient tool to convert a simple, short, and easy to remember
-            string into a long string that is very difficult to guess or brute-force
-        * [Password verification](https://en.wikipedia.org/wiki/Password_hashing):
-            Allows you to know if inputs are the same without knowing the input values,
-            a useful piece for password management
-        * Create personal digital signatures of short texts like emails,
-            i.e. data identity and data integrity
-    * Trezor convenience
-    * Trezor security
-    * Trezor privacy, only your Trezor can generate the same output (digest)
-    * One Trezor for all your needs: [gpg](https://github.com/romanz/trezor-agent),
-        [ssh](https://github.com/romanz/trezor-agent),
-        [symmetric encryption](https://github.com/8go/TrezorSymmetricFileEncryption),
-        [password management](https://github.com/8go/TrezorPass),
-        [encrypted hashes](https://github.com/8go/TrezorHash), etc.
-    * Requires confirmation button click on Trezor device to compute the hash.
-        (Optionally this can be turned off for automated mass-processing.)
-    * It supports both GUI mode and Terminal mode.
-    * Since it is a program that has a full CLI (command line interface)
-      it is easy to create scripts or to automate workflows. Keep in mind though
-      that unless specifically turned off you will have to confirm on the
-      Trezor by clicking its `Confirm` button.
+* Encrypted [https://en.wikipedia.org/wiki/Cryptographic_hash_function](hash)
+    * deterministic, same input (message) leads to same output (digest)
+    * quick
+    * infeasible to determine input from output without brute-forcing
+* Possible applications:
+    * Pseudorandom bit generation
+    * [Key derivation](https://en.wikipedia.org/wiki/Key_derivation_function):
+        Convenient tool to convert a simple, short, and easy to remember
+        string into a long string that is very difficult to guess or brute-force
+    * [Password verification](https://en.wikipedia.org/wiki/Password_hashing):
+        Allows you to know if inputs are the same without knowing the input values,
+        a useful piece for password management
+    * Create personal digital signatures of short texts like emails,
+        i.e. data identity and data integrity
+* Trezor convenience
+* Trezor security
+* Trezor privacy, only your Trezor can generate the same output (digest)
+* One Trezor for all your needs: [gpg](https://github.com/romanz/trezor-agent),
+    [ssh](https://github.com/romanz/trezor-agent),
+    [symmetric encryption](https://github.com/8go/TrezorSymmetricFileEncryption),
+    [password management](https://github.com/8go/TrezorPass),
+    [encrypted hashes](https://github.com/8go/TrezorHash), etc.
+* Requires confirmation button click on Trezor device to compute the hash.
+    (Optionally this can be turned off for automated mass-processing.)
+* It supports both GUI mode and Terminal mode.
+* Since it is a program that has a full CLI (command line interface)
+  it is easy to create scripts or to automate workflows. Keep in mind though
+  that unless specifically turned off you will have to confirm on the
+  Trezor by clicking its `Confirm` button.
 
 # Screenshot
 
@@ -156,7 +156,7 @@ No automated test tool exists.
 
 **Question:** What are the command line options?
 
-**Answer:** See description above. You can do all by command line without GUI.
+**Answer:** See description above. You can do everything by command line without GUI.
 - - -
 **Question:** What crypto technology is used?
 

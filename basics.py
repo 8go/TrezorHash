@@ -5,7 +5,7 @@ from __future__ import print_function
 import logging
 
 # Name of software version
-THVERSION = u'v0.1.0-alpha'
+THVERSION = u'v0.2.0-alpha'
 
 # Date of software version, only used in GUI
 THVERSIONTEXT = u'May 2017'
