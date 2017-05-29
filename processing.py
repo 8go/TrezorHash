@@ -9,18 +9,24 @@ import traceback
 
 from trezorlib.client import CallException, PinException
 
+"""
+This file holds the main business logic.
+It should be shared by the GUI mode and the Terminal mode.
+"""
+
 
 def doWork(teh, settings, dialog):
 	"""
-	Loop through the list of filenames in `settings`
-	and process each one.
+	Do the real work, perform the main business logic.
+	Input comes from settings.
+	Output goes to settings.
+	This function should be shared by GUI mode and Terminal mode.
 
-	@param settings: holds settings for how to log info/warnings/errors
+	@param teh: object holding the trezor logic
+	@type teh: L{trezor_app_specific.TrezorEncryptedHash}
+	@param settings: holds settings for how to log info/warnings/errors,
+		also holds the mlogger
 	@type settings: L{Settings}
-	@param fileMap: object to use to handle file format of encrypted file
-	@type fileMap: L{file_map.FileMap}
-	@param logger: holds logger for where to log info/warnings/errors
-	@type logger: L{logging.Logger}
 	@param dialog: holds GUI window for where to log info/warnings/errors
 	@type dialog: L{dialogs.Dialog}
 	"""
@@ -64,27 +70,33 @@ def doWork(teh, settings, dialog):
 
 def processAll(teh, settings, dialog=None):
 	"""
+	Do the real work, perform the main business logic.
+	Input comes from settings (Terminal mode) or dialog (GUI mode).
+	Output goes to settings (Terminal mode) or dialog (GUI mode).
+	This function should be shared by GUI mode and Terminal mode.
+
 	If dialog is None then processAll() has been called
 	from Terminal and there is no GUI.
 	If dialog is not None processAll() has been called
 	from GUI and there is a window.
 
 	Input is in settings.input,
-	output will be placed in settings.output.
+	Output will be placed in settings.output.
 
+	@param teh: object holding the trezor logic
+	@type teh: L{trezor_app_specific.TrezorEncryptedHash}
 	@param settings: holds settings for how to log info/warnings/errors
+		used to hold inputs and outputs
 	@type settings: L{Settings}
-	@param teh: object to use to handle Trezor work
-	@type fileMap: L{trezor_app_specific.TrezorEncryptedHash}
 	@param dialog: holds GUI window for access to GUI input, output
 	@type dialog: L{dialogs.Dialog}
 	"""
 	if dialog is not None:
 		settings.mlogger.log("Apply button was clicked",
 			logging.DEBUG, "Debug")
-		settings.gui2Settings(dialog)
+		settings.gui2Settings(dialog)  # move input from GUI to settings
 	doWork(teh, settings, dialog)
 	if dialog is not None:
-		settings.settings2Gui(dialog)
+		settings.settings2Gui(dialog)  # move output from settings to GUI
 		settings.mlogger.log("Apply button was processed, returning to GUI",
 			logging.DEBUG, "Debug")

@@ -5,59 +5,71 @@ from __future__ import print_function
 import logging
 import sys
 
-from PyQt4 import QtGui
-from PyQt4.QtGui import QPixmap
+from PyQt5.QtWidgets import QApplication, QDialog, QDialogButtonBox, QShortcut, QMessageBox
+from PyQt5.QtGui import QPixmap, QKeySequence
+from PyQt5.QtCore import QT_VERSION_STR
+from PyQt5.Qt import PYQT_VERSION_STR
 
 from ui_dialog import Ui_Dialog
 
-from encoding import q2s, s2q
+import basics
+import encoding
 from processing import processAll
 
-import basics
+"""
+This code should cover the GUI of the business logic of the application.
+
+Code should work on both Python 2.7 as well as 3.4.
+Requires PyQt5.
+(Old version supported PyQt4.)
+"""
 
 
-class Dialog(QtGui.QDialog, Ui_Dialog):
+class Dialog(QDialog, Ui_Dialog):
 
 	DESCRHEADER = """<!DOCTYPE html><html><head>
 		<body style="font-size:11pt; font-weight:400; font-style:normal;">
-		<b>Welcome to TrezorHash</b>, version """ + basics.THVERSION + """ from
-		""" + basics.THVERSIONTEXT + """<br>The output, the encrypted hash, is
+		<b>Welcome to TrezorHash</b>, version """ + basics.TH_VERSION + """ from
+		""" + basics.TH_VERSION_STR + """<br>The output, the encrypted hash, is
 		placed on the clipboard. The only way to get it is by pasting it to
 		your destination.
 		"""
 	DESCRTRAILER = "</p></body></html>"
 
 	def __init__(self, trezor, settings):
-		QtGui.QDialog.__init__(self)
+		super(Dialog, self).__init__()
+
+		# Set up the user interface from Designer.
 		self.setupUi(self)
 
+		# Make some local modifications.
 		self.trezor = trezor
 		self.settings = settings
 		self.teh = None
 
 		self.inputField.textChanged.connect(self.validate)
 		self.validate()
-		self.version = ""
+		self.version = u""
 		self.description1 = self.DESCRHEADER
-		self.description2 = ""
+		self.description2 = u""
 		self.description3 = self.DESCRTRAILER
 
 		# Apply is not automatically set up, only OK is automatically set up
-		button = self.buttonBox.button(QtGui.QDialogButtonBox.Apply)  # QtGui.QDialogButtonBox.Ok
+		button = self.buttonBox.button(QDialogButtonBox.Apply)  # QDialogButtonBox.Ok
 		button.clicked.connect(self.accept)
 		# Abort is automatically set up as Reject, like Cancel
 
 		# self.buttonBox.clicked.connect(self.handleButtonClick)  # connects ALL buttons
-		# Created the action in GUI with designer-qt4
+		# Created the action in GUI with designer
 		self.actionApply.triggered.connect(self.accept)  # Save
 		self.actionDone.triggered.connect(self.reject)  # Quit
-		QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Q"), self, self.reject)  # Quit
-		QtGui.QShortcut(QtGui.QKeySequence("Ctrl+S"), self, self.accept)  # Save
-		QtGui.QShortcut(QtGui.QKeySequence("Ctrl+A"), self, self.accept)  # Apply
-		QtGui.QShortcut(QtGui.QKeySequence("Ctrl+C"), self, self.copy2Clipboard)
-		QtGui.QShortcut(QtGui.QKeySequence("Ctrl+T"), self, self.printAbout)  # Version/About
+		QShortcut(QKeySequence(u"Ctrl+Q"), self, self.reject)  # Quit
+		QShortcut(QKeySequence(u"Ctrl+S"), self, self.accept)  # Save
+		QShortcut(QKeySequence(u"Ctrl+A"), self, self.accept)  # Apply
+		QShortcut(QKeySequence(u"Ctrl+C"), self, self.copy2Clipboard)
+		QShortcut(QKeySequence(u"Ctrl+T"), self, self.printAbout)  # Version/About
 
-		self.clipboard = QtGui.QApplication.clipboard()
+		self.clipboard = QApplication.clipboard()
 		self.textBrowser.selectionChanged.connect(self.selectionChanged)
 
 	def descrHeader(self):
@@ -73,14 +85,16 @@ class Dialog(QtGui.QDialog, Ui_Dialog):
 		"""
 		Show window with about and version information.
 		"""
-		msgBox = QtGui.QMessageBox(QtGui.QMessageBox.Information, "About",
-			"About <b>TrezorHash</b>: <br><br>TrezorHash " +
+		msgBox = QMessageBox(QMessageBox.Information, "About",
+			u"About <b>TrezorHash</b>: <br><br>TrezorHash " +
 			"computes the encrypted hash (digest) of an input string "
 			"(message) using a Trezor hardware "
 			"device for safety and security.<br><br>" +
-			"<b>TrezorHash Version: </b>" + basics.THVERSION +
-			" from " + basics.THVERSIONTEXT +
-			"<br><br><b>Python Version: </b>" + sys.version.replace(" \n", "; "))
+			"<b>TrezorHash Version: </b>" + basics.TH_VERSION +
+			" from " + basics.TH_VERSION_STR +
+			"<br><br><b>Python Version: </b>" + sys.version.replace(" \n", "; ") +
+			"<br><br><b>Qt Version: </b>" + QT_VERSION_STR +
+			"<br><br><b>PyQt Version: </b>" + PYQT_VERSION_STR)
 		msgBox.setIconPixmap(QPixmap("icons/TrezorHash.92x128.png"))
 		msgBox.exec_()
 
@@ -106,26 +120,26 @@ class Dialog(QtGui.QDialog, Ui_Dialog):
 		self.version = version
 
 	def setDescription(self, extradescription):
-		self.textBrowser.setHtml(s2q(self.description1 + extradescription + self.description3))
+		self.textBrowser.setHtml(self.description1 + extradescription + self.description3)
 
 	def appendDescription(self, extradescription):
 		"""
 		@param extradescription: text in HTML format, use </br> for linebreaks
 		"""
 		self.description2 += extradescription
-		self.textBrowser.setHtml(s2q(self.description1 + self.description2 + self.description3))
+		self.textBrowser.setHtml(self.description1 + self.description2 + self.description3)
 
 	def input(self):
-		return q2s(self.inputField.text())
+		return encoding.normalize_nfc(self.inputField.text())
 
 	def setInput(self, arg):
-		self.inputField.setText(s2q(arg))
+		self.inputField.setText(encoding.normalize_nfc(arg))
 
 	def output(self):
-		return q2s(self.outputField.text())
+		return encoding.normalize_nfc(self.outputField.text())
 
 	def setOutput(self, arg):
-		self.outputField.setText(s2q(arg))
+		self.outputField.setText(encoding.normalize_nfc(arg))
 
 	def validate(self):
 		"""
@@ -135,16 +149,16 @@ class Dialog(QtGui.QDialog, Ui_Dialog):
 		And only when Encrypt is selected.
 		On decrypt passphrase does not need to be specified twice.
 		"""
-		# QtGui.QDialogButtonBox.Ok
-		button = self.buttonBox.button(QtGui.QDialogButtonBox.Apply)
+		# QDialogButtonBox.Ok
+		button = self.buttonBox.button(QDialogButtonBox.Apply)
 		button.setEnabled((self.input() != ""))
 		return (self.input() != "")
 
 	# def handleButtonClick(self, button):
 		# sb = self.buttonBox.standardButton(button)
-		# if sb == QtGui.QDialogButtonBox.Apply:
+		# if sb == QDialogButtonBox.Apply:
 		# 	processAll(self.trezor, self.settings, self)
-		# # elif sb == QtGui.QDialogButtonBox.Reset:
+		# # elif sb == QDialogButtonBox.Reset:
 		# #	self.settings.mlogger.log("Reset Clicked, quitting now...", logging.DEBUG, "UI")
 
 	def accept(self):
@@ -154,7 +168,9 @@ class Dialog(QtGui.QDialog, Ui_Dialog):
 		if self.validate():
 			self.settings.mlogger.log("Apply was called by user request. Start processing now.",
 				logging.DEBUG, "GUI IO")
-			processAll(self.teh, self.settings, self)  #
+			# the main business logic is in this function processAll()
+			# processAll() should be shared between GUI mode and Terminal mode
+			processAll(self.teh, self.settings, self)
 		else:
 			self.settings.mlogger.log("Apply was called by user request. Apply is denied. "
 				"User input is not valid for processing. Did you enter an input string?",

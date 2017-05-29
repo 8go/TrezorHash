@@ -6,23 +6,16 @@ import sys
 import struct
 import unicodedata
 
-from PyQt4 import QtCore
+"""
+This is generic code that should work untouched accross all applications.
+This code implements generic encoding functions.
 
+Class Magic will need some minor customization for specific applications.
 
-def q2s(q):
-	"""Convert QString to UTF-8 string object"""
-	if sys.version_info[0] > 2:
-		return q
-	else:
-		return str(q.toUtf8()).decode('utf-8')
-
-
-def s2q(s):
-	"""Convert UTF-8 encoded string to QString"""
-	if sys.version_info[0] > 2:
-		return s
-	else:
-		return QtCore.QString.fromUtf8(s)
+Code should work on both Python 2.7 as well as 3.4.
+Requires PyQt5.
+(Old version supported PyQt4.)
+"""
 
 
 def unpack(fmt, s):
@@ -46,6 +39,19 @@ def normalize_nfc(txt):
 			return unicodedata.normalize('NFC', txt.decode('utf-8'))
 		if isinstance(txt, str):
 			return unicodedata.normalize('NFC', txt)
+
+
+def tobytes(txt):
+	if sys.version_info[0] < 3:
+		if isinstance(txt, unicode):
+			return txt.encode('utf-8')
+		if isinstance(txt, str):
+			return txt
+	else:
+		if isinstance(txt, bytes):
+			return txt
+		if isinstance(txt, str):
+			return txt.encode('utf-8')
 
 
 class Magic(object):

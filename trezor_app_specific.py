@@ -8,6 +8,15 @@ import logging
 
 import encoding
 
+"""
+This is specific code dealing with the Trezor.
+This code needs to be adjusted/implemented in each applications.
+
+Code should work on both Python 2.7 as well as 3.4.
+Requires PyQt5.
+(Old version supported PyQt4.)
+"""
+
 
 class TrezorEncryptedHash(object):
 	"""
@@ -53,14 +62,14 @@ class TrezorEncryptedHash(object):
 		# receive address
 		# bip32_path = client.expand_path("44'/0'/k'/0/i")
 		"""
-		bip32_path = self.trezor.expand_path("44'/0'/0'/0/0")
+		bip32_path = self.trezor.expand_path(u"44'/0'/0'/0/0")
 		# API is: def get_address(self, coin_name, n, show_display=False, multisig=None, script_type=types.SPENDADDRESS):
-		baddress = self.trezor.get_address('Bitcoin', bip32_path)
+		baddress = self.trezor.get_address(u'Bitcoin', bip32_path)
 		# Address 0 is just for reference or confirmation, it is not used
 		self.settings.mlogger.log("Main Bitcoin address: %s" % baddress,
 			logging.DEBUG, "Trezor IO")
-		bip32_path = self.trezor.expand_path("44'/0'/0'/0/999")  # addr 999
-		baddress = self.trezor.get_address('Bitcoin', bip32_path)
+		bip32_path = self.trezor.expand_path(u"44'/0'/0'/0/999")  # addr 999
+		baddress = self.trezor.get_address(u'Bitcoin', bip32_path)
 		self.baddress = baddress
 
 	def setIv(self):
@@ -74,7 +83,7 @@ class TrezorEncryptedHash(object):
 		if len(iv) != 16:
 			self.settings.mlogger.log("IV length not 16 bytes. Aborting.",
 				logging.CRITICAL, "Internal Error")
-			raise RuntimeError("IV length not 16 bytes.")
+			raise RuntimeError(u"IV length is not 16 bytes.")
 		self.iv = iv
 
 	def trezorEncryptHash(self, input):
@@ -91,6 +100,8 @@ class TrezorEncryptedHash(object):
 		# hexhash = hashlib.sha256(input.encode('utf-8')).hexdigest()
 		# print("hexhash %d" % len(hexhash)) ==> 64; hexhash.encode('utf-8') ==> 64
 
+		# input is already unicode, but make sure it is UTF-8 NFC
+		input = encoding.normalize_nfc(input)
 		# convert unicode to byes and compute sha256 hash
 		binhash = hashlib.sha256(input.encode('utf-8')).digest()
 		# hash is already padded because it is always 64 (multiple of 16)
@@ -105,4 +116,5 @@ class TrezorEncryptedHash(object):
 		# length of hexoutput == 64, length of stroutput == 64
 		hexoutput = binascii.hexlify(binoutput2)
 		stroutput = hexoutput.decode('utf-8')
+		# zzz stroutput = encoding.normalize_nfc(hexoutput)
 		return stroutput

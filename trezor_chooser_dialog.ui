@@ -46,7 +46,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Choose Trezor to use</string>
+      <string>Choose Trezor to use (only unused devices are listed)</string>
      </property>
     </widget>
    </item>

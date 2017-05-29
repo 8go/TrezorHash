@@ -12,17 +12,22 @@ from trezorlib.client import BaseClient  # CallException, PinException
 from trezorlib import messages_pb2 as proto
 from trezorlib.transport import ConnectionError
 
-from trezor_gui import TrezorPassphraseDialog, EnterPinDialog, TrezorChooserDialog
+from trezor_gui import TrezorPassphraseDialog, TrezorPinDialog, TrezorChooserDialog
+
+import encoding
 
 """
-This code is written specifically such that both terminal-only as well as
+This is generic code that should work untouched accross all applications.
+
+This code is written specifically such that both Terminal-only mode as well as
 GUI mode are supported for all 3 operations: Trezor choser, PIN entry,
 Passphrase entry.
 Each of the windows can be turned on or off individually with the 3 flags:
 readpinfromstdin, readpassphrasefromstdin, and readdevicestringfromstdin.
 
 Code should work on both Python 2.7 as well as 3.4.
-Requires PyQt4.
+Requires PyQt5.
+(Old version supported PyQt4.)
 """
 
 
@@ -49,7 +54,7 @@ class QtTrezorMixin(object):
 			# read passphrase from stdin
 			try:
 				passphrase = getpass.getpass(u"Please enter passphrase: ")
-				passphrase = str(passphrase)
+				passphrase = encoding.normalize_nfc(passphrase)
 			except KeyboardInterrupt:
 				sys.stderr.write(u"\nKeyboard interrupt: passphrase not read. Aborting.\n")
 				sys.exit(3)
@@ -80,7 +85,7 @@ class QtTrezorMixin(object):
 				sys.stderr.write(u"Critical error: PIN not read. Aborting. (%s)" % e)
 				sys.exit(7)
 		else:
-			dialog = EnterPinDialog()
+			dialog = TrezorPinDialog()
 			if not dialog.exec_():
 				sys.exit(7)
 			pin = dialog.pin()
@@ -92,10 +97,7 @@ class QtTrezorMixin(object):
 		Instead of asking for passphrase, use this one
 		"""
 		if passphrase is not None:
-			if sys.version_info[0] > 2:
-				self.passphrase = passphrase
-			else:
-				self.passphrase = passphrase.decode("utf-8")
+			self.passphrase = encoding.normalize_nfc(passphrase)
 		else:
 			self.passphrase = None
 
@@ -156,6 +158,11 @@ class TrezorChooser(object):
 		If there are multiple Trezors, diplays a widget with list
 		of Trezor devices to choose from.
 
+		devices is a list of device
+		A device is something like:
+		in Py2:  ['0001:0008:00', '0001:0008:01']
+		In Py3:  [b'0001:0008:00', b'0001:0008:01']
+
 		@returns HidTransport object of selected device
 		"""
 		if not len(devices):
@@ -193,8 +200,13 @@ class TrezorChooser(object):
 				ii += 1
 			ii -= 1
 			while True:
-				inputstr = raw_input(u"Please provide the number of the device "
-					"chosen: (%d-%d, Carriage return to quit) " % (0, ii))
+				if sys.version_info[0] > 2:
+					inputstr = input(u"Please provide the number of the device "
+						"chosen: (%d-%d, Carriage return to quit) " % (0, ii))
+				else:
+					inputstr = raw_input(u"Please provide the number of the device "
+						"chosen: (%d-%d, Carriage return to quit) " % (0, ii))
+
 				if inputstr == '':
 					raise RuntimeError(u"No Trezors device chosen! Quitting.")
 				try:
@@ -208,13 +220,15 @@ class TrezorChooser(object):
 						'between %d and %d. Try again.' % (0, ii))
 					continue
 				break
-			deviceStr = deviceMap.keys()[ii]
+			if sys.version_info[0] > 2:
+				deviceStr = list(deviceMap.keys())[ii]
+			else:
+				deviceStr = deviceMap.keys()[ii]
 		else:
 			dialog = TrezorChooserDialog(deviceMap)
 			if not dialog.exec_():
 				raise RuntimeError(u"No Trezors device chosen! Quitting.")
 			deviceStr = dialog.chosenDeviceStr()
-
 		return HidTransport([deviceStr, None])
 
 
@@ -230,7 +244,7 @@ def setupTrezor(readdevicestringfromstdin=False, mlogger=None):
 		trezor = trezorChooser.getDevice()
 	except (ConnectionError, RuntimeError) as e:
 		if mlogger is not None:
-			mlogger.log(u"Connection to Trezor failed: %s" % e.message,
+			mlogger.log(u"Connection to Trezor failed: %s" % e,
 			logging.CRITICAL, u"Trezor Error")
 		sys.exit(1)
 

@@ -4,14 +4,19 @@ from __future__ import print_function
 
 import logging
 
+"""
+This file contains some constant variables like versioon numbers,
+default values, etc.
+"""
+
 # Name of software version
-THVERSION = u'v0.3.0-alpha'
+TH_VERSION = u'v0.4.0-beta'
 
 # Date of software version, only used in GUI
-THVERSIONTEXT = u'May 2017'
+TH_VERSION_STR = u'May 2017'
 
 # default log level
-DEFAULTLOGLEVEL = logging.INFO  # CRITICAL, ERROR, WARNING, INFO, DEBUG
+DEFAULT_LOG_LEVEL = logging.INFO  # CRITICAL, ERROR, WARNING, INFO, DEBUG
 
 # short acronym used for name of logger
-LOGGERACRONYM = u'th'
+LOGGER_ACRONYM = u'th'

@@ -7,7 +7,7 @@ from __future__ import print_function
 import sys
 import logging
 
-from PyQt4 import QtGui  # for the clipboard and window
+from PyQt5.QtWidgets import QApplication  # for the clipboard and window
 
 from dialogs import Dialog
 
@@ -17,6 +17,14 @@ import encoding
 import processing
 from trezor_app_specific import TrezorEncryptedHash
 import trezor_app_generic
+
+"""
+The file with the main function.
+
+Code should work on both Python 2.7 as well as 3.4.
+Requires PyQt5.
+(Old version supported PyQt4.)
+"""
 
 
 def showGui(trezor, dialog, settings):
@@ -53,10 +61,14 @@ def useTerminal(teh, settings):
 	for ii in range(settings.inputArgs.count('')):
 		settings.inputArgs.remove('')  # get rid of all empty strings
 	if len(settings.inputArgs) == 0:
-		settings.input = raw_input(u"Please provide an input string to be hashed: "
-			"(Carriage return to quit) ")
-		# convert all input as possible to unicode UTF-8
-		settings.input = settings.input.decode('utf-8')
+		if sys.version_info[0] > 2:
+			settings.input = input(u"Please provide an input string to be hashed: "
+				"(Carriage return to quit) ")
+		else:
+			settings.input = raw_input(u"Please provide an input string to be hashed: "
+				"(Carriage return to quit) ")
+		# convert all input as possible to unicode UTF-8 NFC
+		settings.input = encoding.normalize_nfc(settings.input)
 		if settings.input == "":
 			settings.mlogger.log(u"User decided to abandon.", logging.DEBUG,
 				u"Trezor IO")
@@ -73,7 +85,7 @@ def main():
 	# parse command line
 	args = utils.Args(settings)
 	args.parseArgs(sys.argv[1:])
-	myapp = QtGui.QApplication([])
+	myapp = QApplication([])
 
 	trezor = trezor_app_generic.setupTrezor(settings.TArg, settings.mlogger)
 	# trezor.clear_session() ## not needed
@@ -95,7 +107,7 @@ def main():
 	# if there is no command line input, check the clipboard
 	if settings.input is None:
 		clipboard = myapp.clipboard()
-		settings.input = encoding.q2s(clipboard.text())
+		settings.input = encoding.normalize_nfc(clipboard.text())
 		if settings.input != '':
 			settings.mlogger.log("No argument given on command line, "
 				"took input from clipboard.", logging.INFO,
@@ -110,7 +122,7 @@ def main():
 	settings.mlogger.log("Trezor label: %s" % trezor.features.label,
 		logging.INFO, "Trezor IO")
 	settings.mlogger.log("Click 'Confirm' on Trezor to give permission "
-		"each time you produce hash.", logging.INFO, "Trezor IO")
+		"each time you hash a message.", logging.INFO, "Trezor IO")
 
 	teh = TrezorEncryptedHash(trezor, settings)
 
@@ -119,7 +131,7 @@ def main():
 	else:
 		# user wants GUI, so we call the GUI
 		dialog.setTeh(teh)
-		dialog.setVersion(basics.THVERSION)
+		dialog.setVersion(basics.TH_VERSION)
 		showGui(trezor, dialog, settings)
 		dialog.clipboard.setText(u' ' * 128)
 		dialog.clipboard.clear()

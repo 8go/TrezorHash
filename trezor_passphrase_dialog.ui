@@ -56,7 +56,10 @@
    <item>
     <widget class="QLineEdit" name="passphraseEdit">
      <property name="inputMethodHints">
-      <set>Qt::ImhHiddenText|Qt::ImhNoAutoUppercase|Qt::ImhNoPredictiveText</set>
+      <set>Qt::ImhHiddenText|Qt::ImhNoAutoUppercase|Qt::ImhNoPredictiveText|Qt::ImhSensitiveData</set>
+     </property>
+     <property name="maxLength">
+      <number>1024</number>
      </property>
      <property name="echoMode">
       <enum>QLineEdit::Password</enum>

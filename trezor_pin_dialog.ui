@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EnterPinDialog</class>
- <widget class="QDialog" name="EnterPinDialog">
+ <class>TrezorPinDialog</class>
+ <widget class="QDialog" name="TrezorPinDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -37,6 +37,9 @@
      </property>
      <property name="pixmap">
       <pixmap>icons/trezor.38x55.svg</pixmap>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -88,7 +91,10 @@
      <item row="4" column="0" colspan="3">
       <widget class="QLineEdit" name="pinEdit">
        <property name="inputMethodHints">
-        <set>Qt::ImhDigitsOnly|Qt::ImhHiddenText|Qt::ImhNoAutoUppercase|Qt::ImhNoPredictiveText|Qt::ImhPreferNumbers</set>
+        <set>Qt::ImhDigitsOnly|Qt::ImhHiddenText|Qt::ImhNoAutoUppercase|Qt::ImhNoPredictiveText|Qt::ImhSensitiveData</set>
+       </property>
+       <property name="maxLength">
+        <number>9</number>
        </property>
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>
@@ -169,7 +175,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>EnterPinDialog</receiver>
+   <receiver>TrezorPinDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -185,7 +191,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>EnterPinDialog</receiver>
+   <receiver>TrezorPinDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

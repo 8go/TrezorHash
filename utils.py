@@ -6,10 +6,22 @@ import sys
 import logging
 import getopt
 
-from PyQt4 import QtGui
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtCore import QT_VERSION_STR
+from PyQt5.Qt import PYQT_VERSION_STR
 
 import basics
 import encoding
+
+"""
+This is generic code that should work untouched accross all applications.
+This code implements Logging for both Terminal and GUI mode.
+It implements Settings and Argument parsing.
+
+Code should work on both Python 2.7 as well as 3.4.
+Requires PyQt5.
+(Old version supported PyQt4.)
+"""
 
 
 class MLogger(object):
@@ -29,7 +41,7 @@ class MLogger(object):
 		@param logger: holds logger for where to log info/warnings/errors
 		@type logger: L{logging.Logger}
 		@param qtextbrowser: holds GUI widget for where to log info/warnings/errors
-		@type qtextbrowser: L{QtGui.QTextBrowser}
+		@type qtextbrowser: L{PyQt5.QtWidgets.QTextBrowser}
 		"""
 		self.terminalMode = terminalMode
 		self.logger = logger
@@ -49,7 +61,7 @@ class MLogger(object):
 	def setQtextbrowser(self, qtextbrowser):
 		"""
 		@param qtextbrowser: holds GUI widget for where to log info/warnings/errors
-		@type qtextbrowser: L{QtGui.QTextBrowser}
+		@type qtextbrowser: L{PyQt5.QtWidgets.QTextBrowser}
 		"""
 		self.qtextbrowser = qtextbrowser
 
@@ -92,7 +104,7 @@ class MLogger(object):
 		self.qtextbrowser.setTextCursor(cursor)
 
 	def publishQtext(self):
-		self.qtextbrowser.setHtml(encoding.s2q(self.qtext()))
+		self.qtextbrowser.setHtml(self.qtext())
 		self.moveCursorToBottomQtext()
 
 	def log(self, str, level, title, terminalMode=None, logger=None, qtextbrowser=None):
@@ -118,7 +130,7 @@ class MLogger(object):
 		@param logger: holds logger for where to log info/warnings/errors
 		@type logger: L{logging.Logger}
 		@param qtextbrowser: holds GUI widget for where to log info/warnings/errors
-		@type qtextbrowser: L{QtGui.QTextBrowser}
+		@type qtextbrowser: L{PyQt5.QtWidgets.QTextBrowser}
 		"""
 		# get defaults
 		if terminalMode is None:
@@ -129,8 +141,8 @@ class MLogger(object):
 			qtextbrowser = self.qtextbrowser
 		# initialize
 		if logger is None:
-			logging.basicConfig(stream=sys.stderr, level=basics.DEFAULTLOGLEVEL)
-			logger = logging.getLogger(basics.LOGGERACRONYM)
+			logging.basicConfig(stream=sys.stderr, level=basics.DEFAULT_LOG_LEVEL)
+			logger = logging.getLogger(basics.LOGGER_ACRONYM)
 		if qtextbrowser is None:
 			guiExists = False
 		else:
@@ -149,7 +161,7 @@ class MLogger(object):
 				self.appendQtextcontent(u"<br>%s" % (str))
 			else:
 				print(str)  # stdout
-				msgBox = QtGui.QMessageBox(QtGui.QMessageBox.Information,
+				msgBox = QMessageBox(QMessageBox.Information,
 					title, u"%s" % (str))
 				msgBox.exec_()
 		elif level == logging.DEBUG:
@@ -173,7 +185,7 @@ class MLogger(object):
 			else:
 				logger.info(str)
 				if logger.getEffectiveLevel() <= level:
-					msgBox = QtGui.QMessageBox(QtGui.QMessageBox.Information,
+					msgBox = QMessageBox(QMessageBox.Information,
 						title, u"Info: %s" % (str))
 					msgBox.exec_()
 		elif level == logging.WARN:
@@ -186,7 +198,7 @@ class MLogger(object):
 			else:
 				logger.warning(str)
 				if logger.getEffectiveLevel() <= level:
-					msgBox = QtGui.QMessageBox(QtGui.QMessageBox.Warning,
+					msgBox = QMessageBox(QMessageBox.Warning,
 						title, u"Warning: %s" % (str))
 					msgBox.exec_()
 		elif level == logging.ERROR:
@@ -199,7 +211,7 @@ class MLogger(object):
 			else:
 				logger.error(str)
 				if logger.getEffectiveLevel() <= level:
-					msgBox = QtGui.QMessageBox(QtGui.QMessageBox.Critical,
+					msgBox = QMessageBox(QMessageBox.Critical,
 						title, u"Error: %s" % (str))
 					msgBox.exec_()
 		elif level == logging.CRITICAL:
@@ -212,7 +224,7 @@ class MLogger(object):
 			else:
 				logger.critical(str)
 				if logger.getEffectiveLevel() <= level:
-					msgBox = QtGui.QMessageBox(QtGui.QMessageBox.Critical,
+					msgBox = QMessageBox(QMessageBox.Critical,
 						title, u"Critical: %s" % (str))
 					msgBox.exec_()
 		if qtextbrowser is not None:
@@ -239,7 +251,7 @@ class Settings(object):
 		self.VArg = False
 		self.HArg = False
 		self.TArg = False
-		self.LArg = basics.DEFAULTLOGLEVEL
+		self.LArg = basics.DEFAULT_LOG_LEVEL
 		self.MArg = False
 		self.NArg = False
 		self.input = None
@@ -248,8 +260,8 @@ class Settings(object):
 		self.inputArgs = []  # list of input strings
 
 		if logger is None:
-			logging.basicConfig(stream=sys.stderr, level=basics.DEFAULTLOGLEVEL)
-			self.logger = logging.getLogger(basics.LOGGERACRONYM)
+			logging.basicConfig(stream=sys.stderr, level=basics.DEFAULT_LOG_LEVEL)
+			self.logger = logging.getLogger(basics.LOGGER_ACRONYM)
 		else:
 			self.logger = logger
 
@@ -276,7 +288,7 @@ class Settings(object):
 	def settings2Gui(self, dialog):
 		dialog.setInput(self.input)
 		dialog.setOutput(self.outputshort)
-		dialog.clipboard.setText(encoding.s2q(self.output))
+		dialog.clipboard.setText(self.output)
 
 
 class Args(object):
@@ -303,8 +315,10 @@ class Args(object):
 			self.logger = logger
 
 	def printVersion(self):
-		print(u"Version: %s (%s)" % (basics.THVERSION, basics.THVERSIONTEXT))
+		print(u"TrezorHash Version: %s (%s)" % (basics.TH_VERSION, basics.TH_VERSION_STR))
 		print(u"Python: %s" % sys.version.replace(" \n", "; "))
+		print(u"Qt Version: %s" % QT_VERSION_STR)
+		print(u"PyQt Version: %s" % PYQT_VERSION_STR)
 
 	def printUsage(self):
 		print('''TrezorHash.py [-h] [-v] [-t [-m]] [-l <loglevel>] [-n] [<input> [<inputs>]]
@@ -375,7 +389,7 @@ class Args(object):
 		Cancel, Quit: Esc, Control-Q
 		Version, About: Control-T
 
-		Requires: python 2.7 or 3.4+ and PyQt4 and trezorlib library.
+		Requires: python 2.7 or 3.4+ and PyQt5 and trezorlib library.
 		Tested on Linux on Python 2.7 and 3.4.
 
 		BTW, for testing 'xsel -bi', 'xsel -bo' and 'xsel -bc' set, write and clear the clipboard on Linux.
@@ -405,7 +419,7 @@ class Args(object):
 			opts, args = getopt.getopt(argv, "vhl:tmn",
 				["version", "help", "logging=", "terminal", "multiple", "noconfirm"])
 		except getopt.GetoptError as e:
-			msgBox = QtGui.QMessageBox(QtGui.QMessageBox.Critical, u"Wrong arguments",
+			msgBox = QMessageBox(QMessageBox.Critical, u"Wrong arguments",
 				u"Error: %s" % e)
 			msgBox.exec_()
 			logger.critical(u'Wrong arguments. Error: %s.', e)
@@ -444,12 +458,9 @@ class Args(object):
 			settings.LArg = loglevel * 10  # https://docs.python.org/2/library/logging.html#levels
 		logger.setLevel(settings.LArg)
 
-		if sys.version_info[0] > 2:
-			settings.inputArgs = args
-		else:
-			for arg in args:
-				# convert all input as possible to unicode UTF-8
-				settings.inputArgs.append(arg.decode('utf-8'))
+		for arg in args:
+			# convert all input as possible to unicode UTF-8 NFC
+			settings.inputArgs.append(encoding.normalize_nfc(arg))
 		if settings.MArg and not settings.TArg:
 			self.settings.mlogger.log(u"Multiple inputs can only be used "
 				"in terminal mode. Add '-t' or remove '-m'.",
@@ -463,11 +474,15 @@ class Args(object):
 				logging.CRITICAL, "Wrong arguments", True, logger)
 			sys.exit(2)
 		settings.mlogger.setTerminalMode(settings.TArg)
-		self.settings.mlogger.log(u"Version: %s (%s)" %
-			(basics.THVERSION, basics.THVERSIONTEXT),
-			logging.INFO, "Wrong arguments", True, logger)
+		self.settings.mlogger.log(u"TrezorHash Version: %s (%s)" %
+			(basics.TH_VERSION, basics.TH_VERSION_STR),
+			logging.INFO, "Version", True, logger)
 		self.settings.mlogger.log(u"Python: %s" % sys.version.replace(" \n", "; "),
-			logging.INFO, "Wrong arguments", True, logger)
+			logging.INFO, "Version", True, logger)
+		self.settings.mlogger.log(u"Qt Version: %s" % QT_VERSION_STR,
+			logging.INFO, "Version", True, logger)
+		self.settings.mlogger.log(u"PyQt Version: %s" % PYQT_VERSION_STR,
+			logging.INFO, "Version", True, logger)
 		self.settings.mlogger.log(u'Logging level set to %s (%d).' %
 			(logging.getLevelName(settings.LArg), settings.LArg),
 			logging.INFO, "Wrong arguments", True, logger)

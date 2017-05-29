@@ -49,21 +49,34 @@ Below a sample screenshot. More screenshots [here](screenshots).
 
   * [Trezor](https://www.trezor.io) device
   * [Python](https://www.python.org/) v2.7 or 3.4+
-  * PyCrypto
-  * PyQt4
+  * [PyCrypto](https://pypi.python.org/pypi/pycrypto)
+  * [PyQt5](https://pypi.python.org/pypi/PyQt5)
+  * [Qt5](https://doc.qt.io/qt-5/)
   * [trezorlib from python-trezor](https://github.com/trezor/python-trezor)
+  * [Versions 0.3.0 and older used PyQy4 instead of PyQy5. Read the README.md
+  file of v0.3.0 for build requirements, dependencies, etc. Basically anything
+  relating to PyQt5 has to be replaced with the corresponding component in PyQt4. 
+  `pyuic5` becomes `pyuic4`. `pyqt5-dev-tools` becomes `pyqt4-dev-tools`
+  and so forth.]
 
 # Building
 
-Even though the whole code is in Python, there are few Qt4 `.ui` form files that
+Even though the whole code is in Python, there are few Qt5 `.ui` form files that
 need to be transformed into Python files. There is `Makefile`, you just need to run
 
     make
 
 ## Build requirements
 
-PyQt4 development tools are necessary, namely `pyuic4` (look for packages named
-like `pyqt4-dev-tools` or `PyQt4-devel`).
+* PyQt5 development tools are necessary, namely `pyuic5` (look for a package named
+`pyqt5-dev-tools`, `PyQt5-devel` or similar). Required to run `make`.
+* Depending on one's set-up one might need: `qttools5-dev-tools`
+(also sets up some of the Qt5 environment variables)
+* Depending on one's set-up one might need: `python-pyqt5` (Qt5 bindings for Python 2)
+* Depending on one's set-up one might need: `python3-pyqt5` (Qt5 bindings for Python 3)
+* Depending on one's set-up one might need: `python-pyqt5.qtsvg` (to display SVG logos in Python 2)
+* Depending on one's set-up one might need: `python3-pyqt5.qtsvg` (to display SVG logos in Python 3)
+
 
 # Running
 
@@ -145,7 +158,7 @@ Apply, Hash: Control-A, Control-S
 Cancel, Quit: Esc, Control-Q
 Version, About: Control-T
 
-Requires: python 2.7 or 3.4+ and PyQt4 and trezorlib library.
+Requires: python 2.7 or 3.4+ and PyQt5 and trezorlib library.
 Tested on Linux on Python 2.7 and 3.4.
 
 BTW, for testing 'xsel -bi', 'xsel -bo' and 'xsel -bc' set, write and clear the clipboard on Linux.
@@ -263,9 +276,9 @@ Facebook, etc. It will be appreciated.
 TrezorHash available?
 
 **Answer:** On all platforms, operating systems where
-[Python](https://www.python.org/) and PyQt4 is available: Windows, Linux, Unix,
+[Python](https://www.python.org/) and PyQt5 is available: Windows, Linux, Unix,
 Mac OS X. Internet searches show Python for Android and iOS,
-but it has not been investigated or tested on Android or iOS.
+but it has not been investigated, built, or tested on Android or iOS.
 Testing has only been done on Linux.
 - - -
 **Question:** Are there any warranties or guarantees?
@@ -279,10 +292,13 @@ Testing has only been done on Linux.
 
 # To-do List
 
-- [ ]  There is a bug in Qt4 not allowing foreign characters to be entered
+- [x]  There is a bug in Qt4 not allowing foreign characters to be entered
 via the Alt-Gr keys from
 the keyboard in the password field (used to read Trezor passphrase).
 A work around could be written. Immediate work around is copy-paste.
+:arrow_right: This bug has been fixed in Qt5. Tested under Qt5 and it works!
+- [ ] Spread the information about the availability of this tool on social
+networks like Reddit, Twitter or Facebook. Any help appreciated.
 
 
 </> on :octocat: with :heart:

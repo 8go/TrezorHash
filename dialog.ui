@@ -48,7 +48,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap>icons/TrezorHash.92x128.png</pixmap>
+      <pixmap>icons/TrezorHash.92x128.svg</pixmap>
      </property>
      <property name="scaledContents">
       <bool>false</bool>
@@ -70,7 +70,7 @@
    <item>
     <widget class="QLabel" name="labelInput">
      <property name="text">
-      <string>Enter input</string>
+      <string>Enter input message</string>
      </property>
     </widget>
    </item>
@@ -84,7 +84,7 @@
    <item>
     <widget class="QLabel" name="labelOutput">
      <property name="text">
-      <string>Shortened encrypted hash of input (Full hash on clipboard ready for pasting)</string>
+      <string>Shortened encrypted hash of input (Full hash digest on clipboard ready for pasting)</string>
      </property>
     </widget>
    </item>
@@ -145,7 +145,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Cantarell'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'DejaVu Sans'; font-size:12pt; font-weight:600;&quot;&gt;Welcome to TrezorHash. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'DejaVu Sans'; font-size:12pt; font-weight:600;&quot;&gt;Welcome to TrezorHash &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans'; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
