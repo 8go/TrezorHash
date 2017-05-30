@@ -13,6 +13,7 @@ from dialogs import Dialog
 
 import basics
 import utils
+import settings
 import encoding
 import processing
 from trezor_app_specific import TrezorEncryptedHash
@@ -61,12 +62,8 @@ def useTerminal(teh, settings):
 	for ii in range(settings.inputArgs.count('')):
 		settings.inputArgs.remove('')  # get rid of all empty strings
 	if len(settings.inputArgs) == 0:
-		if sys.version_info[0] > 2:
-			settings.input = input(u"Please provide an input string to be hashed: "
-				"(Carriage return to quit) ")
-		else:
-			settings.input = raw_input(u"Please provide an input string to be hashed: "
-				"(Carriage return to quit) ")
+		settings.input = utils.input23(u"Please provide an input string to be hashed: "
+			"(Carriage return to quit) ")
 		# convert all input as possible to unicode UTF-8 NFC
 		settings.input = encoding.normalize_nfc(settings.input)
 		if settings.input == "":
@@ -81,63 +78,63 @@ def useTerminal(teh, settings):
 
 
 def main():
-	settings = utils.Settings()  # initialize settings
-	# parse command line
-	args = utils.Args(settings)
-	args.parseArgs(sys.argv[1:])
 	myapp = QApplication([])
+	sets = settings.Settings()  # initialize settings
+	# parse command line
+	args = settings.Args(sets)
+	args.parseArgs(sys.argv[1:])
 
-	trezor = trezor_app_generic.setupTrezor(settings.TArg, settings.mlogger)
+	trezor = trezor_app_generic.setupTrezor(sets.TArg, sets.mlogger)
 	# trezor.clear_session() ## not needed
-	trezor.prefillReadpinfromstdin(settings.TArg)
-	trezor.prefillReadpassphrasefromstdin(settings.TArg)
+	trezor.prefillReadpinfromstdin(sets.TArg)
+	trezor.prefillReadpassphrasefromstdin(sets.TArg)
 	trezor.prefillPassphrase(u'')
 
-	if settings.TArg:
-		settings.mlogger.log(u"Terminal mode --terminal was set. Avoiding GUI.",
+	if sets.TArg:
+		sets.mlogger.log(u"Terminal mode --terminal was set. Avoiding GUI.",
 			logging.INFO, u"Arguments")
 		dialog = None
 	else:
-		dialog = Dialog(trezor, settings)
-		settings.mlogger.setQtextbrowser(dialog.textBrowser)
-		settings.mlogger.setQtextheader(dialog.descrHeader())
-		settings.mlogger.setQtextcontent(dialog.descrContent())
-		settings.mlogger.setQtexttrailer(dialog.descrTrailer())
+		dialog = Dialog(trezor, sets)
+		sets.mlogger.setQtextbrowser(dialog.textBrowser)
+		sets.mlogger.setQtextheader(dialog.descrHeader())
+		sets.mlogger.setQtextcontent(dialog.descrContent())
+		sets.mlogger.setQtexttrailer(dialog.descrTrailer())
 
 	# if there is no command line input, check the clipboard
-	if settings.input is None:
+	if sets.input is None:
 		clipboard = myapp.clipboard()
-		settings.input = encoding.normalize_nfc(clipboard.text())
-		if settings.input != '':
-			settings.mlogger.log("No argument given on command line, "
+		sets.input = encoding.normalize_nfc(clipboard.text())
+		if sets.input != '':
+			sets.mlogger.log("No argument given on command line, "
 				"took input from clipboard.", logging.INFO,
 				"Arguments")
 		else:
-			settings.mlogger.log("Neither command line nor "
+			sets.mlogger.log("Neither command line nor "
 				"clipboard provided input.", logging.INFO,
 				"Arguments")
-		settings.inputArgs.append(settings.input)
+		sets.inputArgs.append(sets.input)
 		del clipboard
 
-	settings.mlogger.log("Trezor label: %s" % trezor.features.label,
+	sets.mlogger.log("Trezor label: %s" % trezor.features.label,
 		logging.INFO, "Trezor IO")
-	settings.mlogger.log("Click 'Confirm' on Trezor to give permission "
+	sets.mlogger.log("Click 'Confirm' on Trezor to give permission "
 		"each time you hash a message.", logging.INFO, "Trezor IO")
 
-	teh = TrezorEncryptedHash(trezor, settings)
+	teh = TrezorEncryptedHash(trezor, sets)
 
-	if settings.TArg:
-		useTerminal(teh, settings)
+	if sets.TArg:
+		useTerminal(teh, sets)
 	else:
 		# user wants GUI, so we call the GUI
 		dialog.setTeh(teh)
-		dialog.setVersion(basics.TH_VERSION)
-		showGui(trezor, dialog, settings)
+		dialog.setVersion(basics.VERSION)
+		showGui(trezor, dialog, sets)
 		dialog.clipboard.setText(u' ' * 128)
 		dialog.clipboard.clear()
 		del dialog.clipboard  # important to avoid warning on stdout
 	# cleanup
-	settings.mlogger.log("Cleaning up before shutting down.", logging.DEBUG, "Info")
+	sets.mlogger.log("Cleaning up before shutting down.", logging.DEBUG, "Info")
 	trezor.close()
 
 

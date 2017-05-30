@@ -11,7 +11,6 @@ from PyQt5.QtCore import QT_VERSION_STR
 from PyQt5.Qt import PYQT_VERSION_STR
 
 import basics
-import encoding
 
 """
 This is generic code that should work untouched accross all applications.
@@ -24,11 +23,26 @@ Requires PyQt5.
 """
 
 
+def input23(prompt=u''):
+	"""
+	Utility function to bridge Py2 and Py3 incompatibilities.
+	Maps Py2 raw_input() to input() for Py2.
+	Py2: raw_input()
+	Py3: input()
+	"""
+	if sys.version_info[0] < 3:
+		return raw_input(prompt)
+	else:
+		return input(prompt)
+
+
 class MLogger(object):
 	"""
 	class for logging that covers, print, logger, and writing to GUI QTextBrowser widget.
 	Its is called *M*Logger because it can log to *M*ultiple streams
 	such as stdout, QTextBrowser, msgBox, ...
+	Alternatively, he MLogger could have been implemented according to this
+	strategy: https://stackoverflow.com/questions/24469662/how-to-redirect-logger-output-into-pyqt-text-widget
 	"""
 
 	def __init__(self, terminalMode=None, logger=None, qtextbrowser=None):
@@ -161,9 +175,12 @@ class MLogger(object):
 				self.appendQtextcontent(u"<br>%s" % (str))
 			else:
 				print(str)  # stdout
-				msgBox = QMessageBox(QMessageBox.Information,
-					title, u"%s" % (str))
-				msgBox.exec_()
+				try:
+					msgBox = QMessageBox(QMessageBox.Information,
+						title, u"%s" % (str))
+					msgBox.exec_()
+				except Exception:
+					pass
 		elif level == logging.DEBUG:
 			if terminalMode:
 				logger.debug(str)
@@ -185,10 +202,13 @@ class MLogger(object):
 			else:
 				logger.info(str)
 				if logger.getEffectiveLevel() <= level:
-					msgBox = QMessageBox(QMessageBox.Information,
-						title, u"Info: %s" % (str))
-					msgBox.exec_()
-		elif level == logging.WARN:
+					try:
+						msgBox = QMessageBox(QMessageBox.Information,
+							title, u"Info: %s" % (str))
+						msgBox.exec_()
+					except Exception:
+						pass
+		elif level == logging.WARNING:
 			if terminalMode:
 				logger.warning(str)
 			elif guiExists:
@@ -198,9 +218,12 @@ class MLogger(object):
 			else:
 				logger.warning(str)
 				if logger.getEffectiveLevel() <= level:
-					msgBox = QMessageBox(QMessageBox.Warning,
-						title, u"Warning: %s" % (str))
-					msgBox.exec_()
+					try:
+						msgBox = QMessageBox(QMessageBox.Warning,
+							title, u"Warning: %s" % (str))
+						msgBox.exec_()
+					except Exception:
+						pass
 		elif level == logging.ERROR:
 			if terminalMode:
 				logger.error(str)
@@ -211,9 +234,12 @@ class MLogger(object):
 			else:
 				logger.error(str)
 				if logger.getEffectiveLevel() <= level:
-					msgBox = QMessageBox(QMessageBox.Critical,
-						title, u"Error: %s" % (str))
-					msgBox.exec_()
+					try:
+						msgBox = QMessageBox(QMessageBox.Critical,
+							title, u"Error: %s" % (str))
+						msgBox.exec_()
+					except Exception:
+						pass
 		elif level == logging.CRITICAL:
 			if terminalMode:
 				logger.critical(str)
@@ -224,19 +250,24 @@ class MLogger(object):
 			else:
 				logger.critical(str)
 				if logger.getEffectiveLevel() <= level:
-					msgBox = QMessageBox(QMessageBox.Critical,
-						title, u"Critical: %s" % (str))
-					msgBox.exec_()
+					try:
+						msgBox = QMessageBox(QMessageBox.Critical,
+							title, u"Critical: %s" % (str))
+						msgBox.exec_()
+					except Exception:
+						pass
 		if qtextbrowser is not None:
 			# flush changes to GUI
 			self.publishQtext()
 
 
-class Settings(object):
+class BaseSettings(object):
 	"""
 	Placeholder for settings
 	Settings such as command line options, GUI selected values,
 	user input, etc.
+	This class is supposed to be subclassed, e.g. as Settings
+	to adapt to the specifics of the application.
 	"""
 
 	def __init__(self, logger=None, mlogger=None):
@@ -250,14 +281,7 @@ class Settings(object):
 		"""
 		self.VArg = False
 		self.HArg = False
-		self.TArg = False
 		self.LArg = basics.DEFAULT_LOG_LEVEL
-		self.MArg = False
-		self.NArg = False
-		self.input = None
-		self.output = None
-		self.outputshort = None
-		self.inputArgs = []  # list of input strings
 
 		if logger is None:
 			logging.basicConfig(stream=sys.stderr, level=basics.DEFAULT_LOG_LEVEL)
@@ -270,30 +294,34 @@ class Settings(object):
 		else:
 			self.mlogger = mlogger
 
-	def printSettings(self):
-		self.logger.debug("self.VArg = %s", self.VArg)
-		self.logger.debug("self.HArg = %s", self.HArg)
-		self.logger.debug("self.TArg = %s", self.TArg)
-		self.logger.debug("self.LArg = %s", self.LArg)
-		self.logger.debug("self.MArg = %s", self.MArg)
-		self.logger.debug("self.NArg = %s", self.NArg)
-		self.logger.debug("self.input = %s", self.input)
-		self.logger.debug("self.outputshort = %s", self.outputshort)
-		self.logger.debug("self.output = %s", u'***')
-		self.logger.debug("self.inputArgs = %s", str(self.inputArgs))
+	def logSettings(self):
+		self.logger.debug(self.__str__())
 
 	def gui2Settings(self, dialog):
-		self.input = dialog.input()
+		"""
+		This method should be implemented in the subclass.
+		Copy the settings info from the dialog GUI to the Settings instance.
+		"""
+		pass
 
 	def settings2Gui(self, dialog):
-		dialog.setInput(self.input)
-		dialog.setOutput(self.outputshort)
-		dialog.clipboard.setText(self.output)
+		"""
+		This method should be implemented in the subclass.
+		Copy the settings info from the Settings instance to the dialog GUI.
+		"""
+		pass
+
+	def __str__(self):
+		return("settings.VArg = %s\n" % self.VArg +
+			"settings.HArg = %s\n" % self.HArg +
+			"settings.LArg = %s" % self.LArg)
 
 
-class Args(object):
+class BaseArgs(object):
 	"""
 	CLI Argument handling
+	This class is supposed to be subclassed, e.g. as Args
+	to adapt to the specifics of the application.
 	"""
 
 	def __init__(self, settings, logger=None):
@@ -315,91 +343,32 @@ class Args(object):
 			self.logger = logger
 
 	def printVersion(self):
-		print(u"TrezorHash Version: %s (%s)" % (basics.TH_VERSION, basics.TH_VERSION_STR))
+		print(u"%s Version: %s (%s)" % (basics.NAME, basics.VERSION, basics.VERSION_STR))
 		print(u"Python: %s" % sys.version.replace(" \n", "; "))
 		print(u"Qt Version: %s" % QT_VERSION_STR)
 		print(u"PyQt Version: %s" % PYQT_VERSION_STR)
 
 	def printUsage(self):
-		print('''TrezorHash.py [-h] [-v] [-t [-m]] [-l <loglevel>] [-n] [<input> [<inputs>]]
-		This program takes an input message via CLI, clipboard or GUI, and
-		deterministically creates a Trezor-specific encrypted hash (digest).
-		For the same 24 Trezor seeds, independent of passphrase and other
-		parameters, it always returns the same output.
-		It is a one-way function. One cannot compute the input given the output.
-		Output length is always the same, 64 letters from alphabet [a-z0-9].
-		The output digest has 256 bits.
-		Different inputs will with near-vcertainty lead to different outputs.
-		The output is difficult to guess or brute-force.
-		In GUI mode the output is never written to a file or storage. It remains
-		only in memory. It is passed to the user exclusively via the clipboard.
-		When the GUI is closed, the clipboard is automatically overwritten
-		and cleared. So, the output digest must be pasted before closing
-		the GUI.
-
-		Possible use-cases of TrezorHash include:
-		* Pseudorandom bit generation
-		* Key derivation:
-			Convenient tool to convert a simple, short, and easy to remember
-			string into a long string that is very difficult to guess or brute-force
-		* Password verification:
-			Allows you to know if inputs are the same without knowing the input values,
-			a useful piece for password management
-		* Data identity and data integrity:
-			Create personal digital signatures of short texts like emails.
-
+		"""
+		This method should be implemented in the subclass.
+		"""
+		print(basics.NAME + '''.py [-h] [-v] [-l <loglevel>]
 		-v, --version
 				Print the version number
 		-h, --help
 			Print help text
 		-l, --logging
 			Set logging level, integer from 1 to 5, 1=full logging, 5=no logging
-		-t, --terminal
-				Run in the terminal, this avoids the GUI. In terminal mode the
-				output is written to stdout
-		-m, --multiple
-				With `-m` in terminal mode instead of one input, multiple
-				input strings can be given as command line arguments for batch
-				processing.
-		-n, --noconfirm
-				Eliminates the `Confirm` click on the Trezor button. Useful for
-				batch processing. Be very aware that for security reasons
-				the resulting output digest is *different* if `-n` is used!
-		<input>
-				Message, a string, to be hashed and encrypted.
-				If no input is given then program will look at the clipboard for input.
-				If input argument is missing and clipboard is empty program will ask
-				user for input.
-
-		Example usage:
-		TrezorHash.py -t a
-		Input:  "a"
-		Output: "01dc56a86a759a00f4bf1b7e43789092ec197ed302ee799e11eaa18106f84e03"
-
-		TrezorHash.py -t -n a # note the different output!
-		Input:  "a"
-		Output: "c038754a62b903e2a4630b9cedf562e9711cc36c1faef39c2c11c334042686ea"
-
-		TrezorHash.py
-		Input:  "Easy to remember"
-		Output: "626020f7a90752f40abdff004861359b267caf3db7c15d64b1e38dd3cfa5e45d"
-
-		Keyboard shortcuts of GUI:
-		Apply, Hash: Control-A, Control-S
-		Cancel, Quit: Esc, Control-Q
-		Version, About: Control-T
-
-		Requires: python 2.7 or 3.4+ and PyQt5 and trezorlib library.
-		Tested on Linux on Python 2.7 and 3.4.
-
-		BTW, for testing 'xsel -bi', 'xsel -bo' and 'xsel -bc' set, write and clear the clipboard on Linux.
-
 		''')
 
 	def parseArgs(self, argv, settings=None, logger=None):
 		"""
 		Parse the command line arguments and store the results in `settings`.
 		Report errors to `logger`.
+
+		This method should be implemented in the subclass.
+		Calling this method is only useful when the application has exactly
+		the 3 arguments -h -v -l [level]
 
 		@param settings: place to store settings;
 			if None the default settings from the Args class will be used.
@@ -416,8 +385,8 @@ class Args(object):
 		if settings is None:
 			settings = self.settings
 		try:
-			opts, args = getopt.getopt(argv, "vhl:tmn",
-				["version", "help", "logging=", "terminal", "multiple", "noconfirm"])
+			opts, args = getopt.getopt(argv, "vhl:",
+				["version", "help", "logging="])
 		except getopt.GetoptError as e:
 			msgBox = QMessageBox(QMessageBox.Critical, u"Wrong arguments",
 				u"Error: %s" % e)
@@ -435,47 +404,25 @@ class Args(object):
 			elif opt in ("-l", "--logging"):
 				loglevelarg = arg
 				loglevelused = True
-			elif opt in ("-t", "--terminal"):
-				settings.TArg = True
-			elif opt in ("-m", "--multiple"):
-				settings.MArg = True
-			elif opt in ("-n", "--noconfirm"):
-				settings.NArg = True
 
 		if loglevelused:
 			try:
 				loglevel = int(loglevelarg)
-			except Exception as e:
+			except Exception:
 				self.settings.mlogger.log(u"Logging level not specified correctly. "
 					"Must be integer between 1 and 5. (%s)" % loglevelarg, logging.CRITICAL,
-					"Wrong arguments", settings.TArg, logger)
+					"Wrong arguments", True, logger)
 				sys.exit(18)
 			if loglevel > 5 or loglevel < 1:
 				self.settings.mlogger.log(u"Logging level not specified correctly. "
 					"Must be integer between 1 and 5. (%s)" % loglevelarg, logging.CRITICAL,
-					"Wrong arguments", settings.TArg, logger)
+					"Wrong arguments", True, logger)
 				sys.exit(19)
 			settings.LArg = loglevel * 10  # https://docs.python.org/2/library/logging.html#levels
 		logger.setLevel(settings.LArg)
 
-		for arg in args:
-			# convert all input as possible to unicode UTF-8 NFC
-			settings.inputArgs.append(encoding.normalize_nfc(arg))
-		if settings.MArg and not settings.TArg:
-			self.settings.mlogger.log(u"Multiple inputs can only be used "
-				"in terminal mode. Add '-t' or remove '-m'.",
-				logging.CRITICAL, "Wrong arguments", True, logger)
-			sys.exit(2)
-		if len(args) >= 1:
-			settings.input = args[0]
-		if not settings.MArg and len(args) > 1:
-			self.settings.mlogger.log(u"You cannot specify more than one "
-				"input (unless you use '-t -m'). (%s)" % str(args),
-				logging.CRITICAL, "Wrong arguments", True, logger)
-			sys.exit(2)
-		settings.mlogger.setTerminalMode(settings.TArg)
-		self.settings.mlogger.log(u"TrezorHash Version: %s (%s)" %
-			(basics.TH_VERSION, basics.TH_VERSION_STR),
+		self.settings.mlogger.log(u"%s Version: %s (%s)" %
+			(basics.NAME, basics.VERSION, basics.VERSION_STR),
 			logging.INFO, "Version", True, logger)
 		self.settings.mlogger.log(u"Python: %s" % sys.version.replace(" \n", "; "),
 			logging.INFO, "Version", True, logger)
@@ -485,5 +432,6 @@ class Args(object):
 			logging.INFO, "Version", True, logger)
 		self.settings.mlogger.log(u'Logging level set to %s (%d).' %
 			(logging.getLevelName(settings.LArg), settings.LArg),
-			logging.INFO, "Wrong arguments", True, logger)
-		settings.printSettings()
+			logging.INFO, "Logging", True, logger)
+		self.settings.mlogger.log(settings,
+			logging.DEBUG, "Settings", True, logger)

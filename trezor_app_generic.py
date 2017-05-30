@@ -31,6 +31,19 @@ Requires PyQt5.
 """
 
 
+"""
+Utility function to bridge Py2 and Py3 incompatibilities.
+Maps Py2 raw_input() to input() for Py2.
+Py2: raw_input()
+Py3: input()
+sys.version_info[0]
+"""
+try:
+	input = raw_input
+except NameError:
+	pass
+
+
 class QtTrezorMixin(object):
 	"""
 	Mixin for input of Trezor PIN and passhprases.
@@ -200,12 +213,8 @@ class TrezorChooser(object):
 				ii += 1
 			ii -= 1
 			while True:
-				if sys.version_info[0] > 2:
-					inputstr = input(u"Please provide the number of the device "
-						"chosen: (%d-%d, Carriage return to quit) " % (0, ii))
-				else:
-					inputstr = raw_input(u"Please provide the number of the device "
-						"chosen: (%d-%d, Carriage return to quit) " % (0, ii))
+				inputstr = input(u"Please provide the number of the device "
+					"chosen: (%d-%d, Carriage return to quit) " % (0, ii))
 
 				if inputstr == '':
 					raise RuntimeError(u"No Trezors device chosen! Quitting.")
@@ -220,6 +229,7 @@ class TrezorChooser(object):
 						'between %d and %d. Try again.' % (0, ii))
 					continue
 				break
+			# dictionaries are different in Py2 and Py3
 			if sys.version_info[0] > 2:
 				deviceStr = list(deviceMap.keys())[ii]
 			else:

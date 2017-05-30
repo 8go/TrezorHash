@@ -29,8 +29,8 @@ class Dialog(QDialog, Ui_Dialog):
 
 	DESCRHEADER = """<!DOCTYPE html><html><head>
 		<body style="font-size:11pt; font-weight:400; font-style:normal;">
-		<b>Welcome to TrezorHash</b>, version """ + basics.TH_VERSION + """ from
-		""" + basics.TH_VERSION_STR + """<br>The output, the encrypted hash, is
+		<b>Welcome to """ + basics.NAME + """</b>, version """ + basics.VERSION + """ from
+		""" + basics.VERSION_STR + """<br>The output, the encrypted hash, is
 		placed on the clipboard. The only way to get it is by pasting it to
 		your destination.
 		"""
@@ -86,16 +86,16 @@ class Dialog(QDialog, Ui_Dialog):
 		Show window with about and version information.
 		"""
 		msgBox = QMessageBox(QMessageBox.Information, "About",
-			u"About <b>TrezorHash</b>: <br><br>TrezorHash " +
+			u"About <b>" + basics.NAME + "</b>: <br><br>" + basics.NAME + " " +
 			"computes the encrypted hash (digest) of an input string "
 			"(message) using a Trezor hardware "
 			"device for safety and security.<br><br>" +
-			"<b>TrezorHash Version: </b>" + basics.TH_VERSION +
-			" from " + basics.TH_VERSION_STR +
+			"<b>" + basics.NAME + " Version: </b>" + basics.VERSION +
+			" from " + basics.VERSION_STR +
 			"<br><br><b>Python Version: </b>" + sys.version.replace(" \n", "; ") +
 			"<br><br><b>Qt Version: </b>" + QT_VERSION_STR +
 			"<br><br><b>PyQt Version: </b>" + PYQT_VERSION_STR)
-		msgBox.setIconPixmap(QPixmap("icons/TrezorHash.92x128.png"))
+		msgBox.setIconPixmap(QPixmap(basics.LOGO_IMAGE))
 		msgBox.exec_()
 
 	def selectionChanged(self):

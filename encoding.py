@@ -29,6 +29,14 @@ def pack(fmt, s):
 
 
 def normalize_nfc(txt):
+	"""
+	Utility function to bridge Py2 and Py3 incompatibilities.
+	Convert to NFC unicode.
+	Takes string-equivalent or bytes-equivalent and
+	returns str-equivalent in NFC unicode format.
+	Py2: str (aslias bytes), unicode
+	Py3: bytes, str (in unicode format)
+	"""
 	if sys.version_info[0] < 3:
 		if isinstance(txt, unicode):
 			return unicodedata.normalize('NFC', txt)
@@ -42,10 +50,17 @@ def normalize_nfc(txt):
 
 
 def tobytes(txt):
+	"""
+	Utility function to bridge Py2 and Py3 incompatibilities.
+	Convert to bytes.
+	Takes string-equivalent or bytes-equivalent and returns bytesequivalent.
+	Py2: str (aslias bytes), unicode
+	Py3: bytes, str (in unicode format)
+	"""
 	if sys.version_info[0] < 3:
 		if isinstance(txt, unicode):
 			return txt.encode('utf-8')
-		if isinstance(txt, str):
+		if isinstance(txt, str):  # == bytes
 			return txt
 	else:
 		if isinstance(txt, bytes):
