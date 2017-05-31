@@ -264,7 +264,7 @@ class Args(BaseArgs):
 			sys.exit(2)
 		settings.mlogger.setTerminalMode(settings.TArg)
 		self.settings.mlogger.log(u"%s Version: %s (%s)" %
-			(basics.NAME, basics.VERSION, basics.VERSION_STR),
+			(basics.NAME, basics.VERSION_STR, basics.VERSION_DATE_STR),
 			logging.INFO, "Version", True, logger)
 		self.settings.mlogger.log(u"Python: %s" % sys.version.replace(" \n", "; "),
 			logging.INFO, "Version", True, logger)

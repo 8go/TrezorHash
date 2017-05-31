@@ -343,7 +343,7 @@ class BaseArgs(object):
 			self.logger = logger
 
 	def printVersion(self):
-		print(u"%s Version: %s (%s)" % (basics.NAME, basics.VERSION, basics.VERSION_STR))
+		print(u"%s Version: %s (%s)" % (basics.NAME, basics.VERSION_STR, basics.VERSION_DATE_STR))
 		print(u"Python: %s" % sys.version.replace(" \n", "; "))
 		print(u"Qt Version: %s" % QT_VERSION_STR)
 		print(u"PyQt Version: %s" % PYQT_VERSION_STR)
@@ -422,7 +422,7 @@ class BaseArgs(object):
 		logger.setLevel(settings.LArg)
 
 		self.settings.mlogger.log(u"%s Version: %s (%s)" %
-			(basics.NAME, basics.VERSION, basics.VERSION_STR),
+			(basics.NAME, basics.VERSION_STR, basics.VERSION_DATE_STR),
 			logging.INFO, "Version", True, logger)
 		self.settings.mlogger.log(u"Python: %s" % sys.version.replace(" \n", "; "),
 			logging.INFO, "Version", True, logger)

@@ -29,8 +29,8 @@ class Dialog(QDialog, Ui_Dialog):
 
 	DESCRHEADER = """<!DOCTYPE html><html><head>
 		<body style="font-size:11pt; font-weight:400; font-style:normal;">
-		<b>Welcome to """ + basics.NAME + """</b>, version """ + basics.VERSION + """ from
-		""" + basics.VERSION_STR + """<br>The output, the encrypted hash, is
+		<b>Welcome to """ + basics.NAME + """</b>, version """ + basics.VERSION_STR + """ from
+		""" + basics.VERSION_DATE_STR + """<br>The output, the encrypted hash, is
 		placed on the clipboard. The only way to get it is by pasting it to
 		your destination.
 		"""
@@ -49,9 +49,9 @@ class Dialog(QDialog, Ui_Dialog):
 
 		self.inputField.textChanged.connect(self.validate)
 		self.validate()
-		self.version = u""
+		self.version = u''
 		self.description1 = self.DESCRHEADER
-		self.description2 = u""
+		self.description2 = u''
 		self.description3 = self.DESCRTRAILER
 
 		# Apply is not automatically set up, only OK is automatically set up
@@ -90,8 +90,8 @@ class Dialog(QDialog, Ui_Dialog):
 			"computes the encrypted hash (digest) of an input string "
 			"(message) using a Trezor hardware "
 			"device for safety and security.<br><br>" +
-			"<b>" + basics.NAME + " Version: </b>" + basics.VERSION +
-			" from " + basics.VERSION_STR +
+			"<b>" + basics.NAME + " Version: </b>" + basics.VERSION_STR +
+			" from " + basics.VERSION_DATE_STR +
 			"<br><br><b>Python Version: </b>" + sys.version.replace(" \n", "; ") +
 			"<br><br><b>Qt Version: </b>" + QT_VERSION_STR +
 			"<br><br><b>PyQt Version: </b>" + PYQT_VERSION_STR)

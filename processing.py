@@ -15,7 +15,7 @@ It should be shared by the GUI mode and the Terminal mode.
 """
 
 
-def doWork(teh, settings, dialog):
+def doWork(teh, settings, dialog=None):
 	"""
 	Do the real work, perform the main business logic.
 	Input comes from settings.

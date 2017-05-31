@@ -78,7 +78,7 @@ def useTerminal(teh, settings):
 
 
 def main():
-	myapp = QApplication([])
+	app = QApplication(sys.argv)
 	sets = settings.Settings()  # initialize settings
 	# parse command line
 	args = settings.Args(sets)
@@ -103,7 +103,7 @@ def main():
 
 	# if there is no command line input, check the clipboard
 	if sets.input is None:
-		clipboard = myapp.clipboard()
+		clipboard = app.clipboard()
 		sets.input = encoding.normalize_nfc(clipboard.text())
 		if sets.input != '':
 			sets.mlogger.log("No argument given on command line, "
@@ -128,7 +128,7 @@ def main():
 	else:
 		# user wants GUI, so we call the GUI
 		dialog.setTeh(teh)
-		dialog.setVersion(basics.VERSION)
+		dialog.setVersion(basics.VERSION_STR)
 		showGui(trezor, dialog, sets)
 		dialog.clipboard.setText(u' ' * 128)
 		dialog.clipboard.clear()

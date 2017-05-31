@@ -55,7 +55,7 @@ Below a sample screenshot. More screenshots [here](screenshots).
   * [trezorlib from python-trezor](https://github.com/trezor/python-trezor)
   * [Versions 0.3.0 and older used PyQy4 instead of PyQy5. Read the README.md
   file of v0.3.0 for build requirements, dependencies, etc. Basically anything
-  relating to PyQt5 has to be replaced with the corresponding component in PyQt4. 
+  relating to PyQt5 has to be replaced with the corresponding component in PyQt4.
   `pyuic5` becomes `pyuic4`. `pyqt5-dev-tools` becomes `pyqt4-dev-tools`
   and so forth.]
 
@@ -277,7 +277,7 @@ TrezorHash available?
 
 **Answer:** On all platforms, operating systems where
 [Python](https://www.python.org/) and PyQt5 is available: Windows, Linux, Unix,
-Mac OS X. Internet searches show Python for Android and iOS,
+Mac OS X. Internet searches show Python and PyQt5 for Android and iOS,
 but it has not been investigated, built, or tested on Android or iOS.
 Testing has only been done on Linux.
 - - -
