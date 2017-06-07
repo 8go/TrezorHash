@@ -17,7 +17,7 @@ NAME = u'TrezorHash'
 VERSION_STR = u'v0.5.2-beta'
 
 # Date of software version
-VERSION_DATE_STR = u'May 2017'
+VERSION_DATE_STR = u'June 2017'
 
 # default log level
 DEFAULT_LOG_LEVEL = logging.INFO  # CRITICAL, ERROR, WARNING, INFO, DEBUG
