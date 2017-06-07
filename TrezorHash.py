@@ -68,7 +68,7 @@ def useTerminal(teh, settings):
 		settings.input = encoding.normalize_nfc(settings.input)
 		if settings.input == "":
 			settings.mlogger.log(u"User decided to abandon.", logging.DEBUG,
-				u"Trezor IO")
+				u"User IO")
 			sys.exit(3)
 		settings.inputArgs.append(settings.input)
 	for item in settings.inputArgs:

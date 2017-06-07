@@ -66,7 +66,7 @@ need to be transformed into Python files. There is `Makefile`, you just need to 
 
     make
 
-## Build requirements
+# Build requirements
 
 * PyQt5 development tools are necessary, namely `pyuic5` (look for a package named
 `pyqt5-dev-tools`, `PyQt5-devel` or similar). Required to run `make`.
@@ -78,11 +78,18 @@ need to be transformed into Python files. There is `Makefile`, you just need to 
 * Depending on one's set-up one might need: `python3-pyqt5.qtsvg` (to display SVG logos in Python 3)
 
 
+# Testing
+
+There is no special test harness, but to run a simple, quick test, type:
+
+    python TrezorHash.py -t -n helloworld
+
+
 # Running
 
-Run:
+    Run:
 
-    python TrezorHash.py
+        python TrezorHash.py
 or
 
     python3 TrezorHash.py

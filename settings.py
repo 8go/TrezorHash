@@ -78,7 +78,7 @@ class Settings(BaseSettings):
 			"settings.NArg = %s\n" % self.NArg +
 			"settings.input = %s\n" % self.input +
 			"settings.outputshort = %s\n" % self.outputshort +
-			"settings.output = %s\n" % u'***' +
+			"settings.output = %s\n" % "***" +
 			"settings.inputArgs = %s" % self.inputArgs)
 
 
@@ -215,6 +215,7 @@ class Args(BaseArgs):
 			sys.exit(2)
 		loglevelused = False
 		for opt, arg in opts:
+			arg = encoding.normalize_nfc(arg)
 			if opt in ("-h", "--help"):
 				self.printUsage()
 				sys.exit()

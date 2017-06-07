@@ -14,7 +14,7 @@ default values, etc.
 NAME = u'TrezorHash'
 
 # Name of software version
-VERSION_STR = u'v0.5.1-beta'
+VERSION_STR = u'v0.5.2-beta'
 
 # Date of software version
 VERSION_DATE_STR = u'May 2017'

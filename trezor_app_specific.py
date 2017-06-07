@@ -7,6 +7,7 @@ import binascii
 import logging
 
 import encoding
+import basics
 
 """
 This is specific code dealing with the Trezor.
@@ -107,8 +108,8 @@ class TrezorEncryptedHash(object):
 		# hash is already padded because it is always 64 (multiple of 16)
 		# WARNING: changing of ANY parameter will change the result!
 		# AES encrypt the hash on the Trezor
-		binoutput = self.trezor.encrypt_keyvalue(encoding.Magic.hashNode,
-			encoding.Magic.hashKey, binhash,
+		binoutput = self.trezor.encrypt_keyvalue(basics.Magic.hashNode,
+			basics.Magic.hashKey, binhash,
 			ask_on_encrypt=(not self.settings.NArg), ask_on_decrypt=True,
 			iv=self.iv)
 		binoutput2 = hashlib.sha256(binoutput).digest()
