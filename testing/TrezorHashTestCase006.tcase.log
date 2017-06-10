@@ -1,0 +1,8 @@
+Input:  'g4ñẽë儿
+'
+Output: 'bbdc93c9d21c26337c121248767236452abbdeefff9f0a73332151b6ec44104f'
+Input:  'g4ñẽë儿line1
+line2
+line3
+'
+Output: '785c8eeb290912ce8a2fa3b94bb94c1dd7ef61099b129325ce67ea6356d70410'
