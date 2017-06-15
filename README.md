@@ -80,16 +80,16 @@ need to be transformed into Python files. There is `Makefile`, you just need to 
 
 # Testing
 
-There is no special test harness, but to run a simple, quick test, type:
+There is test harness. To run tests, type:
 
-    python TrezorHash.py -t -n helloworld
+    bash testing/testTrezorHash.sh
 
 
 # Running
 
-    Run:
+Run:
 
-        python TrezorHash.py
+    python TrezorHash.py
 or
 
     python3 TrezorHash.py
@@ -170,10 +170,6 @@ Tested on Linux on Python 2.7 and 3.4.
 
 BTW, for testing 'xsel -bi', 'xsel -bo' and 'xsel -bc' set, write and clear the clipboard on Linux.
 ```
-
-# Testing
-
-No automated test tool exists.
 
 # FAQ - Frequently Asked Questions
 
